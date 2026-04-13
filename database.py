@@ -19,8 +19,8 @@ class Lead(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     company = Column(String)
-    email = Column(String, unique=True, index=True)
-    phone = Column(String, nullable=True)
+    email = Column(String, unique=True, nullable=True, index=True)
+    phone = Column(String, unique=True, nullable=True)
     website = Column(String, nullable=True)
     niche = Column(String, default="Law Firm")
     status = Column(String, default="New") # New, Contacted, Interested, Closed

@@ -6,7 +6,7 @@
 import time
 import requests
 from database import SessionLocal, Lead
-from config import GEMINI_API_KEY, DELAY_BETWEEN_LEADS
+from config import GEMINI_API_KEY, DELAY_BETWEEN_LEADS, SOCIAL_MEDIA_DOMAINS
 
 # Use direct REST API to avoid package version issues
 GEMINI_URL = (
@@ -35,6 +35,10 @@ def analyze_website(website_url: str, company_name: str, niche: str) -> dict:
     """
     Gemini AI se website analyze karwao aur personalized pitch likho.
     """
+    is_social = False
+    if website_url:
+        is_social = any(sm in website_url.lower() for sm in SOCIAL_MEDIA_DOMAINS)
+
     if not website_url or not website_url.startswith("http"):
         return {
             "score": 85,
@@ -45,6 +49,18 @@ def analyze_website(website_url: str, company_name: str, niche: str) -> dict:
                 f"Can we connect for a 10-minute call this week?"
             ),
             "issues": "No website found - Highest Priority"
+        }
+
+    if is_social:
+        return {
+            "score": 90,
+            "pitch": (
+                f"I saw your {company_name} profile on social media! You have a great presence there, "
+                f"but you're missing out on direct bookings and SEO traffic without a dedicated website. "
+                f"I specialize in converting social media followers into customers with high-performance websites for {niche}s. "
+                f"Would you be open to a quick chat about this?"
+            ),
+            "issues": "Social media only - Great opportunity for dedicated site"
         }
 
     # Try to fetch website content
