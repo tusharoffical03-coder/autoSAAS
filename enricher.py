@@ -110,53 +110,50 @@ Scoring guide:
 
 def enrich_new_leads(batch_size: int = 20):
     """Database se 'New' leads uthao aur Gemini se analyze karwao."""
-    session = SessionLocal()
-
-    new_leads = session.query(Lead).filter(
-        Lead.status == "New",
-        Lead.ai_score == 0
-    ).limit(batch_size).all()
-
-    if not new_leads:
-        print("[ENRICHER] Koi nayi leads nahi mili enrichment ke liye.")
-        session.close()
-        return 0
-
-    print(f"\n[ENRICHER] {len(new_leads)} leads ko Gemini se analyze kar raha hoon...")
     processed = 0
+    with SessionLocal() as session:
+        new_leads = session.query(Lead).filter(
+            Lead.status == "New",
+            Lead.ai_score == 0
+        ).limit(batch_size).all()
 
-    for lead in new_leads:
-        print(f"\n[ENRICHER] Analyzing: {lead.company} ({lead.website or 'No Website'})")
+        if not new_leads:
+            print("[ENRICHER] Koi nayi leads nahi mili enrichment ke liye.")
+            return 0
 
-        result = analyze_website(
-            website_url=lead.website or "",
-            company_name=lead.company,
-            niche=lead.niche
-        )
+        print(f"\n[ENRICHER] {len(new_leads)} leads ko Gemini se analyze kar raha hoon...")
 
-        lead.ai_score = result["score"]
-        lead.notes = f"ISSUES: {result['issues']}\n\nPITCH: {result['pitch']}"
+        for lead in new_leads:
+            print(f"\n[ENRICHER] Analyzing: {lead.company} ({lead.website or 'No Website'})")
 
-        if result["score"] >= 70:
-            lead.status = "Hot Lead"
-            print(f"   >> SCORE: {result['score']} 🔥 HOT LEAD!")
-        elif result["score"] >= 40:
-            lead.status = "Analyzed"
-            print(f"   >> SCORE: {result['score']} ✅ Good Lead")
-        else:
-            lead.status = "Low Priority"
-            print(f"   >> SCORE: {result['score']} ⬇️ Low Priority")
+            result = analyze_website(
+                website_url=lead.website or "",
+                company_name=lead.company,
+                niche=lead.niche
+            )
 
-        try:
-            session.commit()
-            processed += 1
-        except Exception as e:
-            print(f"[DB] Update error: {e}")
-            session.rollback()
+            lead.ai_score = result["score"]
+            lead.notes = f"ISSUES: {result['issues']}\n\nPITCH: {result['pitch']}"
 
-        time.sleep(DELAY_BETWEEN_LEADS)
+            if result["score"] >= 70:
+                lead.status = "Hot Lead"
+                print(f"   >> SCORE: {result['score']} 🔥 HOT LEAD!")
+            elif result["score"] >= 40:
+                lead.status = "Analyzed"
+                print(f"   >> SCORE: {result['score']} ✅ Good Lead")
+            else:
+                lead.status = "Low Priority"
+                print(f"   >> SCORE: {result['score']} ⬇️ Low Priority")
 
-    session.close()
+            try:
+                session.commit()
+                processed += 1
+            except Exception as e:
+                print(f"[DB] Update error: {e}")
+                session.rollback()
+
+            time.sleep(DELAY_BETWEEN_LEADS)
+
     print(f"\n[ENRICHER] Done! {processed} leads analyzed.")
     return processed
 

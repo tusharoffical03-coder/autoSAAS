@@ -89,46 +89,43 @@ def enrich_emails(batch_size: int = 30):
     Database se leads lo jinka website hai but email nahi.
     Unka website visit karo aur email dhundo.
     """
-    session = SessionLocal()
-
-    leads_to_enrich = session.query(Lead).filter(
-        Lead.website != None,
-        (Lead.email == None) | (Lead.email == ""),
-    ).limit(batch_size).all()
-
-    if not leads_to_enrich:
-        print("[EMAIL] Koi lead nahi mili email enrichment ke liye.")
-        session.close()
-        return 0
-
-    print(f"[EMAIL] {len(leads_to_enrich)} leads ke websites se email dhundh raha hoon...")
     found_count = 0
+    with SessionLocal() as session:
+        leads_to_enrich = session.query(Lead).filter(
+            Lead.website.is_not(None),
+            (Lead.email.is_(None)) | (Lead.email == ""),
+        ).limit(batch_size).all()
 
-    for lead in leads_to_enrich:
-        print(f"   Checking: {lead.company[:40]} → {lead.website[:50]}")
-        email = find_email_for_website(lead.website)
+        if not leads_to_enrich:
+            print("[EMAIL] Koi lead nahi mili email enrichment ke liye.")
+            return 0
 
-        if email:
-            lead.email = email
-            print(f"   ✅ Email mila: {email}")
-            found_count += 1
-        else:
-            print(f"   ❌ Email nahi mila")
+        print(f"[EMAIL] {len(leads_to_enrich)} leads ke websites se email dhundh raha hoon...")
 
-        # Mark it as attempted so we don't retry
-        if not lead.notes:
-            lead.notes = ""
-        lead.notes = lead.notes + " | Email searched"
+        for lead in leads_to_enrich:
+            print(f"   Checking: {lead.company[:40]} → {lead.website[:50]}")
+            email = find_email_for_website(lead.website)
 
-        try:
-            session.commit()
-        except Exception as e:
-            print(f"[DB] Error: {e}")
-            session.rollback()
+            if email:
+                lead.email = email
+                print(f"   ✅ Email mila: {email}")
+                found_count += 1
+            else:
+                print(f"   ❌ Email nahi mila")
 
-        time.sleep(1)  # Polite delay
+            # Mark it as attempted so we don't retry
+            if not lead.notes:
+                lead.notes = ""
+            lead.notes = lead.notes + " | Email searched"
 
-    session.close()
+            try:
+                session.commit()
+            except Exception as e:
+                print(f"[DB] Error: {e}")
+                session.rollback()
+
+            time.sleep(1)  # Polite delay
+
     print(f"\n[EMAIL] Done! {found_count}/{len(leads_to_enrich)} leads ke emails mile.")
     return found_count
 

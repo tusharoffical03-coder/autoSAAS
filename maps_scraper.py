@@ -97,20 +97,22 @@ async def scrape_google_maps(niche: str, city: str, max_results: int = 50) -> li
                     # Extract reviews count
                     reviews_count = 0
                     try:
+                        # aria-label is usually like "4.5 stars 123 reviews"
                         reviews_el = detail_page.locator('span[aria-label*="reviews"]')
                         if await reviews_el.count() > 0:
-                            reviews_text = await reviews_el.first.get_attribute("aria-label")
-                            match = re.search(r'(\d+)', reviews_text.replace(',', ''))
+                            reviews_text = await reviews_el.first.get_attribute("aria-label") or ""
+                            # Look for the number specifically before the word "reviews"
+                            match = re.search(r'([\d,]+)\s+reviews', reviews_text)
                             if match:
-                                reviews_count = int(match.group(1))
+                                reviews_count = int(match.group(1).replace(',', ''))
 
                         if reviews_count == 0:
                             reviews_el = detail_page.locator('button[aria-label*="reviews"]')
                             if await reviews_el.count() > 0:
-                                reviews_text = await reviews_el.first.aria_label()
-                                match = re.search(r'(\d+)', reviews_text.replace(',', ''))
+                                reviews_text = await reviews_el.first.get_attribute("aria-label") or ""
+                                match = re.search(r'([\d,]+)\s+reviews', reviews_text)
                                 if match:
-                                    reviews_count = int(match.group(1))
+                                    reviews_count = int(match.group(1).replace(',', ''))
                     except:
                         pass
 
@@ -222,50 +224,49 @@ async def scrape_google_maps(niche: str, city: str, max_results: int = 50) -> li
 
 def save_maps_leads(leads: list) -> int:
     """Save leads to DB, skip duplicates."""
-    session = SessionLocal()
     saved = 0
     skipped = 0
 
-    for lead in leads:
-        try:
-            # Unique check by phone or name+city
-            exists = None
-            if lead.get("phone"):
-                exists = session.query(Lead).filter(Lead.phone == lead["phone"]).first()
+    with SessionLocal() as session:
+        for lead in leads:
+            try:
+                # Unique check by phone or name+city
+                exists = None
+                if lead.get("phone"):
+                    exists = session.query(Lead).filter(Lead.phone == lead["phone"]).first()
 
-            # Additional check for email uniqueness if it exists
-            if not exists and lead.get("email"):
-                exists = session.query(Lead).filter(Lead.email == lead["email"]).first()
+                # Additional check for email uniqueness if it exists
+                if not exists and lead.get("email"):
+                    exists = session.query(Lead).filter(Lead.email == lead["email"]).first()
 
-            if not exists and lead.get("name"):
-                exists = session.query(Lead).filter(
-                    Lead.name == lead["name"],
-                    Lead.notes.contains(lead.get("city", ""))
-                ).first()
+                if not exists and lead.get("name"):
+                    exists = session.query(Lead).filter(
+                        Lead.name == lead["name"],
+                        Lead.notes.contains(lead.get("city", ""))
+                    ).first()
 
-            if not exists:
-                new_lead = Lead(
-                    name=lead.get("name", "")[:100],
-                    company=lead.get("company", "")[:100],
-                    email=lead.get("email", ""),
-                    phone=lead.get("phone", ""),
-                    website=lead.get("website", ""),
-                    niche=lead.get("niche", "General"),
-                    status="New",
-                    ai_score=0,
-                    notes=f"Google Maps | {lead.get('city','')} | {lead.get('address','')}"
-                )
-                session.add(new_lead)
-                session.commit()
-                saved += 1
-            else:
-                skipped += 1
+                if not exists:
+                    new_lead = Lead(
+                        name=lead.get("name", "")[:100],
+                        company=lead.get("company", "")[:100],
+                        email=lead.get("email"),
+                        phone=lead.get("phone"),
+                        website=lead.get("website"),
+                        niche=lead.get("niche", "General"),
+                        status="New",
+                        ai_score=0,
+                        notes=f"Google Maps | {lead.get('city','')} | {lead.get('address','')}"
+                    )
+                    session.add(new_lead)
+                    session.commit()
+                    saved += 1
+                else:
+                    skipped += 1
 
-        except Exception as e:
-            print(f"[DB] Error: {e}")
-            session.rollback()
+            except Exception as e:
+                print(f"[DB] Error: {e}")
+                session.rollback()
 
-    session.close()
     print(f"[DB] Saved: {saved} | Skipped (duplicate): {skipped}")
     return saved
 

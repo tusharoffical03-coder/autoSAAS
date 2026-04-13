@@ -37,15 +37,14 @@ def print_banner():
 
 
 def print_stats():
-    session = SessionLocal()
-    total     = session.query(Lead).count()
-    hot       = session.query(Lead).filter(Lead.status == "Hot Lead").count()
-    analyzed  = session.query(Lead).filter(Lead.status == "Analyzed").count()
-    contacted = session.query(Lead).filter(Lead.status == "Contacted").count()
-    new       = session.query(Lead).filter(Lead.status == "New").count()
-    with_email = session.query(Lead).filter(Lead.email != "").count()
-    with_phone = session.query(Lead).filter(Lead.phone != "").count()
-    session.close()
+    with SessionLocal() as session:
+        total     = session.query(Lead).count()
+        hot       = session.query(Lead).filter(Lead.status == "Hot Lead").count()
+        analyzed  = session.query(Lead).filter(Lead.status == "Analyzed").count()
+        contacted = session.query(Lead).filter(Lead.status == "Contacted").count()
+        new       = session.query(Lead).filter(Lead.status == "New").count()
+        with_email = session.query(Lead).filter(Lead.email.is_not(None)).count()
+        with_phone = session.query(Lead).filter(Lead.phone.is_not(None)).count()
 
     print(f"""
 ----------------------------------------------
