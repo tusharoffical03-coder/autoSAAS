@@ -1,0 +1,15 @@
+# Keys and Secrets
+config.py
+.env
+
+# Database
+leads.db
+*.sqlite
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
