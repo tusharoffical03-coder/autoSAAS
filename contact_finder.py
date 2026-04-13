@@ -92,9 +92,8 @@ def enrich_emails(batch_size: int = 30):
     session = SessionLocal()
 
     leads_to_enrich = session.query(Lead).filter(
-        Lead.website != "",
         Lead.website != None,
-        Lead.email == "",
+        (Lead.email == None) | (Lead.email == ""),
     ).limit(batch_size).all()
 
     if not leads_to_enrich:

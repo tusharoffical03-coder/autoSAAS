@@ -7,8 +7,10 @@
 import asyncio
 import re
 import time
+from urllib.parse import urlparse
 from playwright.async_api import async_playwright
 from database import SessionLocal, Lead
+from config import GENERIC_KEYWORDS, SOCIAL_MEDIA_DOMAINS, PROFESSIONAL_EXTENSIONS
 
 # How long to wait for page elements (ms)
 TIMEOUT = 45000
@@ -86,6 +88,38 @@ async def scrape_google_maps(niche: str, city: str, max_results: int = 50) -> li
                         await detail_page.close()
                         continue
 
+                    # --- STRICT FILTERING: Generic Names ---
+                    if any(kw in name.lower() for kw in GENERIC_KEYWORDS):
+                        print(f"   [SKIP] Generic name: {name}")
+                        await detail_page.close()
+                        continue
+
+                    # Extract reviews count
+                    reviews_count = 0
+                    try:
+                        reviews_el = detail_page.locator('span[aria-label*="reviews"]')
+                        if await reviews_el.count() > 0:
+                            reviews_text = await reviews_el.first.get_attribute("aria-label")
+                            match = re.search(r'(\d+)', reviews_text.replace(',', ''))
+                            if match:
+                                reviews_count = int(match.group(1))
+
+                        if reviews_count == 0:
+                            reviews_el = detail_page.locator('button[aria-label*="reviews"]')
+                            if await reviews_el.count() > 0:
+                                reviews_text = await reviews_el.first.aria_label()
+                                match = re.search(r'(\d+)', reviews_text.replace(',', ''))
+                                if match:
+                                    reviews_count = int(match.group(1))
+                    except:
+                        pass
+
+                    # --- STRICT FILTERING: Reviews < 3 ---
+                    if reviews_count < 3:
+                        print(f"   [SKIP] Too few reviews ({reviews_count}): {name}")
+                        await detail_page.close()
+                        continue
+
                     # Extract phone number
                     phone = ""
                     try:
@@ -109,6 +143,12 @@ async def scrape_google_maps(niche: str, city: str, max_results: int = 50) -> li
                         except:
                             pass
 
+                    # --- STRICT FILTERING: No Phone Number ---
+                    if not phone:
+                        print(f"   [SKIP] No phone number: {name}")
+                        await detail_page.close()
+                        continue
+
                     # Extract website
                     website = ""
                     try:
@@ -120,8 +160,21 @@ async def scrape_google_maps(niche: str, city: str, max_results: int = 50) -> li
 
                     # 🎯 STRATEGY: Target Only NO WEBSITE businesses
                     if website:
-                        await detail_page.close()
-                        continue
+                        # Skip professional domains but allow social media profiles
+                        lower_web = website.lower()
+                        is_social = any(sm in lower_web for sm in SOCIAL_MEDIA_DOMAINS)
+
+                        # Better professional domain check using netloc
+                        try:
+                            netloc = urlparse(website).netloc.lower()
+                            is_pro_domain = any(netloc.endswith(ext) for ext in PROFESSIONAL_EXTENSIONS)
+                        except:
+                            is_pro_domain = False
+
+                        if is_pro_domain and not is_social:
+                            print(f"   [SKIP] Has professional website: {website}")
+                            await detail_page.close()
+                            continue
 
                     # Extract address
                     address = ""
@@ -136,12 +189,12 @@ async def scrape_google_maps(niche: str, city: str, max_results: int = 50) -> li
                     lead = {
                         "name": name,
                         "company": name,
-                        "phone": phone,
-                        "website": website,
-                        "address": address,
+                        "phone": phone or None,
+                        "website": website or None,
+                        "address": address or None,
                         "niche": niche,
                         "city": city,
-                        "email": "",
+                        "email": None,
                         "map_link": href,
                     }
                     leads.append(lead)
@@ -179,6 +232,11 @@ def save_maps_leads(leads: list) -> int:
             exists = None
             if lead.get("phone"):
                 exists = session.query(Lead).filter(Lead.phone == lead["phone"]).first()
+
+            # Additional check for email uniqueness if it exists
+            if not exists and lead.get("email"):
+                exists = session.query(Lead).filter(Lead.email == lead["email"]).first()
+
             if not exists and lead.get("name"):
                 exists = session.query(Lead).filter(
                     Lead.name == lead["name"],

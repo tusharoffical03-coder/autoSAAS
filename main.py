@@ -10,8 +10,7 @@ from database import init_db, SessionLocal, Lead
 from maps_scraper import run_maps_scraper
 from contact_finder import enrich_emails
 from enricher import enrich_new_leads
-
-import random
+from config import MAX_RESULTS_PER_TARGET, CYCLE_DELAY
 
 # ================================================================
 #   SEARCH TARGETS — Customize karo
@@ -26,8 +25,6 @@ SEARCH_TARGETS = [
     {"niche": "restaurant",       "city": "Phoenix"},
     {"niche": "construction",     "city": "San Diego"},
 ]
-
-MAX_RESULTS_PER_TARGET = 15  # Ek cycle me kitni leads Maps se nikalni hain
 
 
 def print_banner():
@@ -74,6 +71,7 @@ def main():
     print_stats()
 
     cycle = 1
+    target_index = 0
     while True:
         ts = datetime.datetime.now().strftime('%H:%M:%S')
         print(f"\n{'='*55}")
@@ -82,12 +80,14 @@ def main():
 
         # ── STEP 1: Google Maps Scraping ──────────────────────
         print("\n[STEP 1/3] Google Maps se real leads scrape ho rahi hain...")
-        target = random.choice(SEARCH_TARGETS)
+        target = SEARCH_TARGETS[target_index]
         saved = run_maps_scraper(
             niche=target["niche"],
             city=target["city"],
             max_results=MAX_RESULTS_PER_TARGET
         )
+        # Cycle through targets systematically
+        target_index = (target_index + 1) % len(SEARCH_TARGETS)
         print(f"   [DONE] {target['niche']} / {target['city']} -> {saved} saved\n")
 
         # ── STEP 2: Email Discovery ───────────────────────────
@@ -103,10 +103,10 @@ def main():
         # ── Stats ─────────────────────────────────────────────
         print_stats()
         print(f"[CYCLE #{cycle}] Complete! Dashboard: http://localhost:8000")
-        print(f"[CYCLE #{cycle}] Agli cycle 2 min mein... (Rokne ke liye CTRL+C)\n")
+        print(f"[CYCLE #{cycle}] Agli cycle {CYCLE_DELAY}s mein... (Rokne ke liye CTRL+C)\n")
 
         cycle += 1
-        time.sleep(120)  # 2 min wait
+        time.sleep(CYCLE_DELAY)
 
 
 if __name__ == "__main__":
