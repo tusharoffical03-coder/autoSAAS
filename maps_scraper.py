@@ -253,6 +253,8 @@ def save_maps_leads(leads: list) -> int:
                         phone=lead.get("phone"),
                         website=lead.get("website"),
                         niche=lead.get("niche", "General"),
+                    city=lead.get("city"),
+                    map_link=lead.get("map_link"),
                         status="New",
                         ai_score=0,
                         notes=f"Google Maps | {lead.get('city','')} | {lead.get('address','')}"

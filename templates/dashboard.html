@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global AI Agency | Lead Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Global AI Lead Engine | Liquid Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --bg: #030712;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
             --text-dim: #94a3b8;
-            --success: #22c55e;
-            --accent: #f43f5e;
-            --hot: #f97316;
-            --warning: #fbbf24;
+            --success: #10b981;
+            --hot: #f59e0b;
+            --danger: #ef4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,13 +25,46 @@
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Animated Aurora Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.4;
+        }
+        .blob {
+            position: absolute;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            animation: move 20s infinite alternate;
+        }
+        .blob-1 { background: #4f46e5; top: -10%; left: -10%; }
+        .blob-2 { background: #7c3aed; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .blob-3 { background: #db2777; top: 40%; left: 30%; animation-delay: -10s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
         }
 
         .container {
-            max-width: 1300px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 1400px;
             padding: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         header {
@@ -39,321 +72,308 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 3rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #334155;
+            padding: 1.5rem 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            animation: float 6s ease-in-out infinite;
         }
 
-        /* FIX: Added standard background-clip alongside vendor prefix */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(to right, #818cf8, #c084fc);
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #fff 0%, #6366f1 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid #22c55e44;
-            padding: 0.4rem 1rem;
+        /* Liquid Search Bar */
+        .search-container {
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
             border-radius: 2rem;
-            font-size: 0.85rem;
-            color: var(--success);
-        }
-
-        .live-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.5rem;
             margin-bottom: 3rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-end;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .stat-card {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            border: 1px solid #334155;
-            transition: border-color 0.2s;
+        .search-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
-        .stat-card:hover { border-color: var(--primary); }
-
-        .stat-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .stat-value.hot { color: var(--hot); }
-        .stat-value.green { color: var(--success); }
-
-        .stat-label {
-            color: var(--text-dim);
+        .search-group label {
             font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            margin-top: 0.25rem;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 1.25rem;
-            color: var(--text);
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding-left: 0.5rem;
         }
 
-        .table-wrap {
-            overflow-x: auto;
+        .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 1rem 1.5rem;
             border-radius: 1rem;
-            border: 1px solid #334155;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card);
+        .search-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
+        /* Liquid Button & Filter */
+        .gooey-button {
+            filter: url('#gooey');
+            position: relative;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            overflow: visible;
+        }
+
+        .gooey-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Table Overhaul */
+        .table-glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .table-header {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .btn-csv {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-csv:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
         th {
             text-align: left;
-            padding: 1rem 1.25rem;
-            background: #1a2540;
+            padding: 1.5rem 2rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
             color: var(--text-dim);
-            font-weight: 600;
-            font-size: 0.8rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        td {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            transition: background 0.3s;
+        }
+        tr { animation: slideIn 0.5s ease-out backwards; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        {% for i in range(20) %}
+        tr:nth-child({{ i + 1 }}) { animation-delay: {{ i * 0.05 }}s; }
+        {% endfor %}
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+        .badge-hot { background: rgba(245, 158, 11, 0.2); color: var(--hot); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-new { background: rgba(99, 102, 241, 0.2); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.3); }
 
-        td {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid #1e293b;
-            vertical-align: middle;
-        }
-
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(99, 102, 241, 0.05); }
-
-        /* Status Badges */
-        .badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 2rem;
-            font-size: 0.72rem;
-            font-weight: 700;
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        .badge-new       { background: rgba(99,102,241,0.15); color: #818cf8; }
-        .badge-hot       { background: rgba(249,115,22,0.15); color: var(--hot); }
-        .badge-analyzed  { background: rgba(34,197,94,0.12); color: var(--success); }
-        .badge-contacted { background: rgba(251,191,36,0.12); color: var(--warning); }
-        .badge-low       { background: rgba(148,163,184,0.1); color: var(--text-dim); }
-        .badge-closed    { background: rgba(244,63,94,0.12); color: var(--accent); }
-
-        /* AI Score Bar */
-        .score-wrap { display: flex; align-items: center; gap: 0.6rem; }
-        .score-num {
-            font-weight: 700;
-            font-size: 1rem;
-            min-width: 36px;
-            color: var(--warning);
-        }
-        .score-bar-bg {
-            flex:1; height:6px; background:#334155; border-radius:3px; min-width:60px;
-        }
-        .score-bar-fill {
-            height:100%; border-radius:3px;
-            background: linear-gradient(to right, #6366f1, #f43f5e);
-        }
-
-        .notes-cell {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            max-width: 280px;
-            white-space: pre-line;
-            line-height: 1.4;
-        }
-
-        .company-name { font-weight: 600; font-size: 0.95rem; }
-        .niche-tag {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-            margin-top: 0.1rem;
-        }
-
-        .site-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-        .site-link:hover { text-decoration: underline; }
-        .no-site { color: var(--accent); font-size: 0.8rem; }
-
-        .btn {
-            background: var(--primary);
+        .btn-circle {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
             color: white;
-            padding: 0.4rem 0.9rem;
-            border-radius: 0.5rem;
             text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: background 0.2s;
-            white-space: nowrap;
+            transition: all 0.3s;
         }
-        .btn:hover { background: var(--primary-dark); }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-dim);
+        .btn-circle:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        tr { animation: fadeIn 0.4s ease forwards; }
+        .map-icon { font-size: 1.2rem; }
+
+        .stat-mini { display: flex; flex-direction: column; }
+        .stat-mini-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 0.1em; }
+        .stat-mini-value { font-size: 1.4rem; font-weight: 800; }
     </style>
 </head>
 <body>
+    <!-- Liquid SVG Filter -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
+        <defs>
+            <filter id="gooey">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="aurora-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <div class="container">
         <header>
-            <div class="logo">⚡ GLOBAL AI ENGINE</div>
-            <div class="live-badge">
-                <div class="live-dot"></div>
-                System Live
+            <div class="logo">GLOBAL AI ENGINE v3.5</div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    ● GLOBAL NODE ACTIVE
+                </div>
             </div>
         </header>
 
-        <!-- STATS -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">{{ total_leads }}</div>
-                <div class="stat-label">Total Leads</div>
+        <!-- SEARCH BAR -->
+        <form action="/search" method="post" class="search-container">
+            <div class="search-group">
+                <label>Niche</label>
+                <input type="text" name="niche" class="search-input" placeholder="e.g. Med Spa, Real Estate" required>
             </div>
-            <div class="stat-card">
-                <div class="stat-value hot">{{ leads | selectattr('status', 'equalto', 'Hot Lead') | list | length }}</div>
-                <div class="stat-label">🔥 Hot Leads</div>
+            <div class="search-group">
+                <label>Location</label>
+                <input type="text" name="location" class="search-input" placeholder="e.g. Beverly Hills, London" required>
             </div>
-            <div class="stat-card">
-                <div class="stat-value green">{{ leads | selectattr('status', 'equalto', 'Analyzed') | list | length }}</div>
-                <div class="stat-label">✅ Analyzed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" style="color: var(--warning)">{{ leads | selectattr('status', 'equalto', 'Contacted') | list | length }}</div>
-                <div class="stat-label">📬 Contacted</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" style="color:#818cf8">{{ leads | selectattr('status', 'equalto', 'New') | list | length }}</div>
-                <div class="stat-label">🆕 Pending</div>
-            </div>
-        </div>
+            <button type="submit" class="gooey-button">GENERATE LEADS</button>
+        </form>
 
         <!-- TABLE -->
-        <div class="section-title">All Leads — Sorted by Latest</div>
-        <div class="table-wrap">
+        <div class="table-glass">
+            <div class="table-header">
+                <div style="display: flex; gap: 2rem;">
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Total</div>
+                        <div class="stat-mini-value">{{ stats.total }}</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Hot</div>
+                        <div class="stat-mini-value" style="color: var(--hot)">{{ stats.hot }}</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Global Cities</div>
+                        <div class="stat-mini-value" style="color: var(--primary)">{{ stats.cities }}</div>
+                    </div>
+                </div>
+                <a href="/export/csv" class="btn-csv">EXPORT DATA (CSV)</a>
+            </div>
             <table>
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Company / Niche</th>
-                        <th>Contact</th>
+                        <th>Company</th>
+                        <th>Location</th>
                         <th>Website</th>
-                        <th>AI Score</th>
                         <th>Status</th>
-                        <th>Notes / Pitch</th>
+                        <th>Map</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if leads %}
-                        {% for lead in leads %}
-                        <tr>
-                            <td style="color:var(--text-dim); font-size:0.8rem;">{{ loop.index }}</td>
-                            <td>
-                                <div class="company-name">{{ lead.company or 'Unknown' }}</div>
-                                <div class="niche-tag">{{ lead.niche }}</div>
-                            </td>
-                            <td>
+                    {% for lead in leads %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 700; font-size: 1rem;">{{ lead.company }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-dim);">{{ lead.niche }}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 500;">{{ lead.city or 'Global' }}</div>
+                        </td>
+                        <td>
+                            {% if lead.website %}
+                            <a href="{{ lead.website }}" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">Open Site ↗</a>
+                            {% else %}
+                            <span style="color: var(--danger); font-size: 0.8rem; font-weight: 600;">NO WEBSITE</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if lead.status == 'Hot Lead' %}badge-hot{% else %}badge-new{% endif %}">
+                                {{ lead.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if lead.map_link %}
+                            <a href="{{ lead.map_link }}" target="_blank" class="btn-circle">📍</a>
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.75rem;">
                                 {% if lead.email %}
-                                <div style="font-size:0.82rem;">{{ lead.email }}</div>
+                                <a href="mailto:{{ lead.email }}" class="btn-circle">📧</a>
                                 {% endif %}
                                 {% if lead.phone %}
-                                <div style="font-size:0.78rem; color:var(--text-dim);">{{ lead.phone }}</div>
+                                <a href="tel:{{ lead.phone }}" class="btn-circle">📞</a>
                                 {% endif %}
-                                {% if not lead.email and not lead.phone %}
-                                <span style="color:var(--text-dim); font-size:0.8rem;">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if lead.website %}
-                                <a href="{{ lead.website }}" target="_blank" class="site-link">Visit ↗</a>
-                                {% else %}
-                                <span class="no-site">No Website</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="score-wrap">
-                                    <span class="score-num">{{ lead.ai_score }}</span>
-                                    <div class="score-bar-bg">
-                                        <div class="score-bar-fill" style="width: {{ lead.ai_score }}%;"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                {% if lead.status == 'Hot Lead' %}
-                                <span class="badge badge-hot">🔥 Hot Lead</span>
-                                {% elif lead.status == 'Analyzed' %}
-                                <span class="badge badge-analyzed">✅ Analyzed</span>
-                                {% elif lead.status == 'Contacted' %}
-                                <span class="badge badge-contacted">📬 Contacted</span>
-                                {% elif lead.status == 'Low Priority' %}
-                                <span class="badge badge-low">⬇ Low</span>
-                                {% elif lead.status == 'Closed' %}
-                                <span class="badge badge-closed">✔ Closed</span>
-                                {% else %}
-                                <span class="badge badge-new">🆕 New</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="notes-cell">{{ (lead.notes or '—')[:120] }}{% if lead.notes and lead.notes|length > 120 %}…{% endif %}</div>
-                            </td>
-                            <td>
-                                {% if lead.email %}
-                                <a href="mailto:{{ lead.email }}" class="btn">📧 Pitch</a>
-                                {% else %}
-                                <a href="{{ lead.website or '#' }}" target="_blank" class="btn">🌐 Visit</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="8">
-                                <div class="empty-state">
-                                    <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
-                                    <div>Koi lead nahi mili. <code>python main.py</code> chalao aur leads aa jayengi!</div>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
