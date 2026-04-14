@@ -292,6 +292,11 @@
 
         <!-- SEARCH BAR -->
         <form action="/search" method="post" class="search-container">
+            {% if message %}
+            <div style="position: absolute; top: -40px; left: 0; width: 100%; text-align: center; color: var(--primary); font-weight: 600; font-size: 0.9rem; animation: fadeIn 0.5s ease-out;">
+                ✨ {{ message }}
+            </div>
+            {% endif %}
             <div class="search-group">
                 <label>Niche</label>
                 <input type="text" name="niche" class="search-input" placeholder="e.g. Med Spa, Real Estate" required>
@@ -330,7 +335,7 @@
                         <th>Website</th>
                         <th>Status</th>
                         <th>Map</th>
-                        <th>Action</th>
+                        <th>Connect</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -369,6 +374,15 @@
                                 {% endif %}
                                 {% if lead.phone %}
                                 <a href="tel:{{ lead.phone }}" class="btn-circle">📞</a>
+                                {% endif %}
+                                {% if lead.instagram %}
+                                <a href="{{ lead.instagram }}" target="_blank" class="btn-circle">📸</a>
+                                {% endif %}
+                                {% if lead.twitter %}
+                                <a href="{{ lead.twitter }}" target="_blank" class="btn-circle">🐦</a>
+                                {% endif %}
+                                {% if lead.linkedin %}
+                                <a href="{{ lead.linkedin }}" target="_blank" class="btn-circle">💼</a>
                                 {% endif %}
                             </div>
                         </td>

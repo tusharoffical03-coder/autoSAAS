@@ -273,9 +273,9 @@ def save_maps_leads(leads: list) -> int:
     return saved
 
 
-def run_maps_scraper(niche: str, city: str, max_results: int = 50) -> int:
-    """Sync wrapper to run async scraper."""
-    leads = asyncio.run(scrape_google_maps(niche, city, max_results))
+async def run_maps_scraper(niche: str, city: str, max_results: int = 50) -> int:
+    """Async wrapper to run scraper."""
+    leads = await scrape_google_maps(niche, city, max_results)
     return save_maps_leads(leads)
 
 

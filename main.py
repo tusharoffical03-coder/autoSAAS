@@ -1,13 +1,15 @@
 # ================================================================
 #   MAIN.PY - Lead Generation System Orchestrator (v2)
-#   Pipeline: Google Maps → Email Finder → Gemini AI
+#   Pipeline: Google Maps + Social Scout → Email Finder → Gemini AI
 #   Run: python main.py
 # ================================================================
 
 import time
 import datetime
+import asyncio
 from database import init_db, SessionLocal, Lead
 from maps_scraper import run_maps_scraper
+from social_scout import run_social_scout
 from contact_finder import enrich_emails
 from enricher import enrich_new_leads
 from config import MAX_RESULTS_PER_TARGET, CYCLE_DELAY
@@ -31,7 +33,7 @@ def print_banner():
     print("""
 ==============================================================
     REAL LEAD GENERATION SYSTEM v2.0
-    Google Maps + Email Finder + Gemini AI                   
+    Multi-Agent: Maps + Social + Email + Gemini AI
 ==============================================================
 """)
 
@@ -61,6 +63,25 @@ def print_stats():
 """)
 
 
+async def run_cycle(target):
+    # ── STEP 1: Google Maps Scraping ──────────────────────
+    print(f"\n[STEP 1] Maps Scraping: {target['niche']} in {target['city']}...")
+    maps_saved = await run_maps_scraper(
+        niche=target["niche"],
+        city=target["city"],
+        max_results=MAX_RESULTS_PER_TARGET
+    )
+
+    # ── STEP 2: Social Scouting ───────────────────────────
+    print(f"[STEP 2] Social Scouting (IG/TW/LI): {target['niche']}...")
+    social_saved = await run_social_scout(
+        niche=target["niche"],
+        location=target["city"]
+    )
+
+    return maps_saved + social_saved
+
+
 def main():
     print_banner()
 
@@ -72,30 +93,28 @@ def main():
     cycle = 1
     target_index = 0
     while True:
+        # Systematic cycling through search targets
+        target = SEARCH_TARGETS[target_index]
+
         ts = datetime.datetime.now().strftime('%H:%M:%S')
         print(f"\n{'='*55}")
-        print(f"  🔄 CYCLE #{cycle} | ⏰ {ts}")
+        print(f"  🔄 CYCLE #{cycle} | ⏰ {ts} | Target: {target['niche']} in {target['city']}")
         print(f"{'='*55}")
 
-        # ── STEP 1: Google Maps Scraping ──────────────────────
-        print("\n[STEP 1/3] Google Maps se real leads scrape ho rahi hain...")
-        target = SEARCH_TARGETS[target_index]
-        saved = run_maps_scraper(
-            niche=target["niche"],
-            city=target["city"],
-            max_results=MAX_RESULTS_PER_TARGET
-        )
-        # Cycle through targets systematically
-        target_index = (target_index + 1) % len(SEARCH_TARGETS)
-        print(f"   [DONE] {target['niche']} / {target['city']} -> {saved} saved\n")
+        # Run Scrapers
+        saved = asyncio.run(run_cycle(target))
 
-        # ── STEP 2: Email Discovery ───────────────────────────
-        print("\n[STEP 2/3] Business websites se real emails dhundhe ja rahe hain...")
+        # Advance to next target for next cycle
+        target_index = (target_index + 1) % len(SEARCH_TARGETS)
+        print(f"   [DONE] {target['niche']} / {target['city']} -> {saved} total leads saved\n")
+
+        # ── Email Discovery ───────────────────────────
+        print("\n[ENRICH] Business websites se real emails dhundhe ja rahe hain...")
         emails_found = enrich_emails(batch_size=15)
         print(f"   [DONE] {emails_found} real emails mile!\n")
 
-        # ── STEP 3: Gemini AI Scoring ─────────────────────────
-        print("\n[STEP 3/3] Gemini AI lead scoring aur pitch generation...")
+        # ── Gemini AI Scoring ─────────────────────────
+        print("\n[AI] Gemini AI lead scoring aur pitch generation...")
         scored = enrich_new_leads(batch_size=15)
         print(f"   [DONE] {scored} leads score ho gayi!\n")
 

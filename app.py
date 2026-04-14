@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Depends, Request, Form
+from fastapi import FastAPI, Depends, Request, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import SessionLocal, Lead
 from maps_scraper import run_maps_scraper
+from social_scout import run_social_scout
 import uvicorn
+import asyncio
 import csv
 import io
 
@@ -20,6 +22,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+async def background_search(niche: str, location: str):
+    """Run scrapers in background to avoid blocking the UI."""
+    print(f"[BG_SEARCH] Starting search for {niche} in {location}")
+    await run_maps_scraper(niche=niche, city=location, max_results=10)
+    await run_social_scout(niche=niche, location=location)
+    print(f"[BG_SEARCH] Search completed for {niche} in {location}")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request, db: Session = Depends(get_db)):
@@ -40,9 +49,15 @@ async def read_dashboard(request: Request, db: Session = Depends(get_db)):
     )
 
 @app.post("/search", response_class=HTMLResponse)
-async def search_leads(request: Request, niche: str = Form(...), location: str = Form(...), db: Session = Depends(get_db)):
-    # Run scraper in real-time
-    run_maps_scraper(niche=niche, city=location, max_results=10)
+async def search_leads(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    niche: str = Form(...),
+    location: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    # Trigger scrapers in background
+    background_tasks.add_task(background_search, niche, location)
 
     leads = db.query(Lead).order_by(Lead.created_at.desc()).all()
     stats = {
@@ -52,10 +67,16 @@ async def search_leads(request: Request, niche: str = Form(...), location: str =
         "cities": len(set([l.city for l in leads if l.city]))
     }
 
+    # Inform the user that the search is running in the background
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
-        context={"leads": leads, "stats": stats, "search_performed": True}
+        context={
+            "leads": leads,
+            "stats": stats,
+            "search_performed": True,
+            "message": "Search started in background. Refresh in a few moments to see new leads!"
+        }
     )
 
 @app.get("/export/csv")

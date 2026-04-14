@@ -25,6 +25,9 @@ class Lead(Base):
     niche = Column(String, default="Law Firm")
     city = Column(String, nullable=True)
     map_link = Column(String, nullable=True)
+    twitter = Column(String, nullable=True)
+    linkedin = Column(String, nullable=True)
+    instagram = Column(String, nullable=True)
     status = Column(String, default="New") # New, Contacted, Interested, Closed
     ai_score = Column(Integer, default=0) # 0-100 based on "Opportunity"
     notes = Column(Text, nullable=True)

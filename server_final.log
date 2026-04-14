@@ -1,0 +1,37 @@
+INFO:     Started server process [599121]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:35660 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32950 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49156 - "GET / HTTP/1.1" 200 OK
+
+[MAPS] Searching: 'Italian Restaurant in London'
+[MAPS] 32 listings dikhe. Processing...
+   [SKIP] Has professional website: https://www.bigmammagroup.com/italian-restaurants/ave-mario?utm_source=google&utm_medium=organic&utm_campaign=mybusiness-website
+   [SKIP] Has professional website: https://www.amalfi.co.uk/?utm_source=google&utm_medium=organic&utm_campaign=google_lpm_amalfiristorante_argyllstreet
+   [SKIP] Has professional website: https://osterianapoletana.co.uk/
+   [SKIP] No phone number: Circolo Popolare 🇮🇹
+   [SKIP] Has professional website: http://www.boccadilupo.com/
+   [1] Osteria Angelina | tel:02072411851 | YES
+   [SKIP] Has professional website: https://www.farosrestaurant.co.uk/
+   [SKIP] Has professional website: https://bigmammagroup.com/italian-restaurants/carlotta?utm_source=google&utm_medium=organic&utm_campaign=mybusiness-website
+   [SKIP] Has professional website: https://bocconcinorestaurant.co.uk/soho
+   [SKIP] No phone number: Tiella Trattoria & Bar
+   [2] Doppo | tel:02071832100 | YES
+   [SKIP] Has professional website: https://www.64oldcomptonstreet.com/?utm_source=local&utm_medium=organic&utm_campaign=gmb
+   [SKIP] Has professional website: http://www.bancone.co.uk/
+   [SKIP] Has professional website: https://vasinikopizza.co.uk/
+   [SKIP] Has professional website: http://www.centoallatorre.com/
+   [SKIP] Has professional website: http://osteriaromana.co.uk/
+   [SKIP] Has professional website: http://www.luceelimoni.com/
+   [3] Luca | tel:02038593000 | YES
+   [SKIP] Has professional website: http://artusi.co.uk/
+   [SKIP] Has professional website: https://www.bellaitalia.co.uk/restaurants/london/wellington-street/?utm_source=google&utm_medium=organic&utm_campaign=google_lpm_bellaitalia_wellingtonstreet
+   [SKIP] Has professional website: https://comogarden.co.uk/
+   [SKIP] Has professional website: https://cantinetta-antinori.uk/menus/
+   [SKIP] Has professional website: http://www.gratolondon.com/
+   [SKIP] Has professional website: https://sancarlo.co.uk/restaurants/london/isola-london/?utm_source=google&utm_medium=organic_gbp&utm_campaign=gbp_isola_london
+   [SKIP] Has professional website: http://www.nuovisaporilondon.co.uk/
+   [SKIP] Has professional website: https://www.maiellaworth.com/?utm_source=google&utm_medium=wix_google_business_profile&utm_campaign=13365231475119246692
+INFO:     127.0.0.1:60152 - "GET / HTTP/1.1" 200 OK
