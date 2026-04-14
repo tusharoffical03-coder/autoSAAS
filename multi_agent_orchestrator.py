@@ -10,6 +10,7 @@ from database import SessionLocal, Lead, init_db
 from maps_scraper import run_maps_scraper
 from reddit_agent import run_reddit_agent
 from twitter_agent import run_twitter_agent
+from social_scout import run_social_scout
 from config import CYCLE_DELAY
 
 async def run_swarm_cycle(niche, city):
@@ -22,8 +23,9 @@ async def run_swarm_cycle(niche, city):
     # Run all agents in parallel
     results = await asyncio.gather(
         run_maps_scraper(niche, city, max_results=10),
-        run_reddit_agent(),
-        run_twitter_agent(),
+        run_reddit_agent(niche, city),
+        run_twitter_agent(niche, city),
+        run_social_scout(niche, city),
         return_exceptions=True
     )
 
@@ -31,13 +33,15 @@ async def run_swarm_cycle(niche, city):
     maps_saved = results[0] if isinstance(results[0], int) else 0
     reddit_saved = results[1] if isinstance(results[1], int) else 0
     twitter_saved = results[2] if isinstance(results[2], int) else 0
+    social_saved = results[3] if isinstance(results[3], int) else 0
 
-    total_saved = maps_saved + reddit_saved + twitter_saved
+    total_saved = maps_saved + reddit_saved + twitter_saved + social_saved
 
     print(f"\n[SWARM] Cycle Complete!")
     print(f"   [AGENT-MAPS]    : {maps_saved} leads")
     print(f"   [AGENT-REDDIT]  : {reddit_saved} leads")
     print(f"   [AGENT-TWITTER] : {twitter_saved} leads")
+    print(f"   [AGENT-SOCIAL]  : {social_saved} leads (LinkedIn/IG)")
     print(f"   [TOTAL NEW]     : {total_saved} leads saved to DB")
 
     return total_saved
