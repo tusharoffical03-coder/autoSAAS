@@ -238,6 +238,24 @@
         .badge-hot { background: rgba(245, 158, 11, 0.2); color: var(--hot); border: 1px solid rgba(245, 158, 11, 0.3); }
         .badge-new { background: rgba(99, 102, 241, 0.2); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.3); }
 
+        /* Source Badges */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+        .source-maps { color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+        .source-twitter { color: #1da1f2; border-color: rgba(29, 161, 242, 0.3); }
+        .source-reddit { color: #ff4500; border-color: rgba(255, 69, 0, 0.3); }
+
+        .intent-high { color: var(--danger); text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+
         .btn-circle {
             width: 40px; height: 40px;
             display: flex; align-items: center; justify-content: center;
@@ -330,8 +348,9 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Source</th>
                         <th>Company</th>
-                        <th>Location</th>
+                        <th>Intent</th>
                         <th>Website</th>
                         <th>Status</th>
                         <th>Map</th>
@@ -342,11 +361,21 @@
                     {% for lead in leads %}
                     <tr>
                         <td>
-                            <div style="font-weight: 700; font-size: 1rem;">{{ lead.company }}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-dim);">{{ lead.niche }}</div>
+                            <div class="source-badge source-{{ lead.source|lower }}">
+                                {% if lead.source == 'Twitter' %}🐦
+                                {% elif lead.source == 'Reddit' %}👽
+                                {% else %}📍{% endif %}
+                                {{ lead.source }}
+                            </div>
                         </td>
                         <td>
-                            <div style="font-weight: 500;">{{ lead.city or 'Global' }}</div>
+                            <div style="font-weight: 700; font-size: 1rem;">{{ lead.company }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-dim);">{{ lead.niche }} | {{ lead.city or 'Global' }}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 800; font-size: 0.8rem;" class="intent-{{ lead.lead_intent|lower }}">
+                                {{ lead.lead_intent }}
+                            </div>
                         </td>
                         <td>
                             {% if lead.website %}

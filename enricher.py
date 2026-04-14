@@ -10,8 +10,8 @@ from config import GEMINI_API_KEY, DELAY_BETWEEN_LEADS, SOCIAL_MEDIA_DOMAINS
 
 # Use direct REST API to avoid package version issues
 GEMINI_URL = (
-    f"https://generativelanguage.googleapis.com/v1beta/models/"
-    f"gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    f"https://generativelanguage.googleapis.com/v1/models/"
+    f"gemini-pro:generateContent?key={GEMINI_API_KEY}"
 )
 
 print("[GEMINI] AI Brain initialized.")
@@ -25,7 +25,11 @@ def call_gemini(prompt: str) -> str:
     try:
         resp = requests.post(GEMINI_URL, json=payload, timeout=30)
         data = resp.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        if "candidates" in data and data["candidates"]:
+            return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        else:
+            print(f"[GEMINI] Unexpected response structure: {data}")
+            return ""
     except Exception as e:
         print(f"[GEMINI] API call error: {e}")
         return ""

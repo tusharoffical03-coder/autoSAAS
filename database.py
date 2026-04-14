@@ -28,6 +28,8 @@ class Lead(Base):
     twitter = Column(String, nullable=True)
     linkedin = Column(String, nullable=True)
     instagram = Column(String, nullable=True)
+    source = Column(String, default="Maps") # Maps, Twitter, Reddit
+    lead_intent = Column(String, default="Medium") # High, Medium, Low
     status = Column(String, default="New") # New, Contacted, Interested, Closed
     ai_score = Column(Integer, default=0) # 0-100 based on "Opportunity"
     notes = Column(Text, nullable=True)

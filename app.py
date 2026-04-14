@@ -3,8 +3,7 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import SessionLocal, Lead
-from maps_scraper import run_maps_scraper
-from social_scout import run_social_scout
+from multi_agent_orchestrator import run_swarm_cycle
 import uvicorn
 import asyncio
 import csv
@@ -25,10 +24,9 @@ def get_db():
 
 async def background_search(niche: str, location: str):
     """Run scrapers in background to avoid blocking the UI."""
-    print(f"[BG_SEARCH] Starting search for {niche} in {location}")
-    await run_maps_scraper(niche=niche, city=location, max_results=10)
-    await run_social_scout(niche=niche, location=location)
-    print(f"[BG_SEARCH] Search completed for {niche} in {location}")
+    print(f"[BG_SEARCH] Starting swarm search for {niche} in {location}")
+    await run_swarm_cycle(niche, location)
+    print(f"[BG_SEARCH] Swarm search completed for {niche} in {location}")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request, db: Session = Depends(get_db)):
@@ -85,11 +83,11 @@ async def export_csv(db: Session = Depends(get_db)):
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["ID", "Name", "Company", "Email", "Phone", "Website", "Niche", "City", "Status", "AI Score", "Notes", "Map Link"])
+    writer.writerow(["ID", "Source", "Intent", "Name", "Company", "Email", "Phone", "Website", "Niche", "City", "Status", "AI Score", "Notes", "Map Link"])
 
     for lead in leads:
         writer.writerow([
-            lead.id, lead.name, lead.company, lead.email, lead.phone, lead.website,
+            lead.id, lead.source, lead.lead_intent, lead.name, lead.company, lead.email, lead.phone, lead.website,
             lead.niche, lead.city, lead.status, lead.ai_score, lead.notes, lead.map_link
         ])
 

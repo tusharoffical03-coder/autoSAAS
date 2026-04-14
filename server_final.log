@@ -35,3 +35,19 @@ INFO:     127.0.0.1:49156 - "GET / HTTP/1.1" 200 OK
    [SKIP] Has professional website: http://www.nuovisaporilondon.co.uk/
    [SKIP] Has professional website: https://www.maiellaworth.com/?utm_source=google&utm_medium=wix_google_business_profile&utm_campaign=13365231475119246692
 INFO:     127.0.0.1:60152 - "GET / HTTP/1.1" 200 OK
+   [SKIP] Has professional website: https://www.overuk.com/
+   [SKIP] Has professional website: https://www.laporchetta.uk/
+   [SKIP] Has professional website: http://www.rexcross.co.uk/
+   [SKIP] Has professional website: http://www.eatatsicily.com/
+   [SKIP] Has professional website: https://www.macellaiorc.com/
+
+[MAPS] Total real leads found: 3
+[DB] Saved: 3 | Skipped (duplicate): 0
+[SOCIAL] Searching instagram...
+[SOCIAL] Searching twitter...
+[SOCIAL] Searching linkedin...
+INFO:     127.0.0.1:55872 - "GET / HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [599121]
