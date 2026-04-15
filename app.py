@@ -4,10 +4,33 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import SessionLocal, Lead
 from multi_agent_orchestrator import run_swarm_cycle
+from contact_form_agent import submit_contact_form
 import uvicorn
 import asyncio
 import csv
-import io
+import sys
+
+# Windows ProactorEventLoop "I/O on closed pipe" silent fix
+if sys.platform == 'win32':
+    # Force ProactorEventLoop as it is REQUIRED for subprocesses (Playwright) on Windows
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    
+    from functools import wraps
+    from asyncio.proactor_events import _ProactorBasePipeTransport
+    
+    def silence_event_loop_closed(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except (RuntimeError, ValueError) as exc:
+                if "closed pipe" in str(exc) or "Event loop is closed" in str(exc):
+                    pass
+                else:
+                    raise
+        return wrapper
+        
+    _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
 
 app = FastAPI(title="Global AI Agency Dashboard")
 
@@ -97,6 +120,26 @@ async def export_csv(db: Session = Depends(get_db)):
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=leads_export.csv"}
     )
+
+@app.post("/api/submit-contact/{lead_id}")
+async def api_submit_contact(lead_id: int, db: Session = Depends(get_db)):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if not lead or not lead.website:
+        return {"success": False, "error": "Lead or Website not found"}
+    
+    # We use default sender info for now as discussed in plan
+    success = await submit_contact_form(
+        website_url=lead.website,
+        name="Tushar Tyagi",
+        email="tyagi.tushar.grow@gmail.com", # Placeholder sender
+        pitch=lead.ai_pitch or "I'd love to help you build a modern website!"
+    )
+    
+    if success:
+        lead.status = "Contacted"
+        db.commit()
+        return {"success": True}
+    return {"success": False, "error": "Form submission failed"}
 
 if __name__ == "__main__":
     import os

@@ -32,13 +32,29 @@ class Lead(Base):
     lead_intent = Column(String, default="Medium") # High, Medium, Low
     status = Column(String, default="New") # New, Contacted, Interested, Closed
     ai_score = Column(Integer, default=0) # 0-100 based on "Opportunity"
+    ai_pitch = Column(Text, nullable=True) # Personalized outreach message
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-# Create tables
+# Create tables and handle migrations
 def init_db():
     Base.metadata.create_all(bind=engine)
+    
+    # Custom migration for ai_pitch column
+    import sqlite3
+    try:
+        conn = sqlite3.connect('leads.db')
+        cursor = conn.cursor()
+        # Check if ai_pitch exists
+        cursor.execute("PRAGMA table_info(leads)")
+        columns = [column[1] for column in cursor.fetchall()]
+        if 'ai_pitch' not in columns:
+            cursor.execute('ALTER TABLE leads ADD COLUMN ai_pitch TEXT')
+            print("[DB] Migration: Added ai_pitch column.")
+        conn.close()
+    except Exception as e:
+        print(f"[DB] Migration Note: {e}")
 
 if __name__ == "__main__":
     init_db()
-    print("Database Initialized: leads.db created successfully.")
+    print("Database Initialized: leads.db ready.")

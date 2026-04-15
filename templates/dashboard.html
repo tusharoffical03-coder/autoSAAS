@@ -306,6 +306,7 @@
         .source-maps { color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
         .source-twitter { color: #1da1f2; border-color: rgba(29, 161, 242, 0.3); }
         .source-reddit { color: #ff4500; border-color: rgba(255, 69, 0, 0.3); }
+        .source-freelance { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
 
         .intent-high { color: var(--danger); text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
@@ -372,14 +373,9 @@
                 <label>Niche</label>
                 <select name="niche" class="search-input" required>
                     <option value="" disabled selected>Choose Niche...</option>
-                    <option value="Law Firm">Law Firm ⚖️</option>
-                    <option value="Med Spa">Med Spa 🌸</option>
-                    <option value="Gym & Fitness">Gym & Fitness 🏋️</option>
-                    <option value="Dental Clinic">Dental Clinic 🦷</option>
-                    <option value="Real Estate">Real Estate 🏠</option>
-                    <option value="Luxury Car Rental">Luxury Car Rental 🏎️</option>
-                    <option value="Interior Design">Interior Design 🎨</option>
-                    <option value="Tech Startup">Tech Startup 💻</option>
+                    <option value="Doctor Clinic">Doctor Clinic 🩺</option>
+                    <option value="Restaurant">Restaurant 🍽️</option>
+                    <option value="Plumber">Plumber 🔧</option>
                 </select>
             </div>
             <div class="search-group">
@@ -447,13 +443,20 @@
                             <div class="source-badge source-{{ lead.source|lower }}">
                                 {% if lead.source == 'Twitter' %}🐦
                                 {% elif lead.source == 'Reddit' %}👽
+                                {% elif lead.source == 'Freelance' %}💼
                                 {% else %}📍{% endif %}
                                 {{ lead.source }}
                             </div>
                         </td>
                         <td>
                             <div style="font-weight: 700; font-size: 1rem;">{{ lead.company }}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-dim);">{{ lead.niche }} | {{ lead.city or 'Global' }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">{{ lead.niche }} | {{ lead.city or 'Global' }}</div>
+                            {% if lead.ai_pitch %}
+                            <div style="margin-top: 0.5rem; background: rgba(99, 102, 241, 0.1); padding: 0.75rem; border-radius: 0.5rem; border-left: 2px solid var(--primary);">
+                                <div style="font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-bottom: 0.2rem;">✨ AI DM PITCH</div>
+                                <div style="font-size: 0.8rem; color: #fff;">{{ lead.ai_pitch }}</div>
+                            </div>
+                            {% endif %}
                         </td>
                         <td>
                             <div style="font-weight: 800; font-size: 0.8rem;" class="intent-{{ lead.lead_intent|lower }}">
@@ -480,22 +483,40 @@
                             {% endif %}
                         </td>
                         <td>
-                            <div style="display: flex; gap: 0.75rem;">
-                                {% if lead.email %}
-                                <a href="mailto:{{ lead.email }}" class="btn-circle">📧</a>
-                                {% endif %}
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                                 {% if lead.phone %}
-                                <a href="tel:{{ lead.phone }}" class="btn-circle">📞</a>
+                                {% set phone_clean = lead.phone | replace('+', '') | replace(' ', '') | replace('-', '') %}
+                                {% set pitch_encoded = lead.ai_pitch | urlencode if lead.ai_pitch else "Hey, I noticed you might need a new website. Can we chat?" | urlencode %}
+                                <a href="whatsapp://send?phone={{ phone_clean }}&text={{ pitch_encoded }}" class="btn-circle" style="width: auto; padding: 0.5rem 1rem; border-radius: 1rem; color: #fff; background: #25D366; text-decoration: none; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    💬 Send WhatsApp Pitch
+                                </a>
                                 {% endif %}
-                                {% if lead.instagram %}
-                                <a href="{{ lead.instagram }}" target="_blank" class="btn-circle">📸</a>
+
+                                {% if lead.email %}
+                                {% set subject = ("Quick Idea for " ~ lead.company) | urlencode %}
+                                {% set body = (lead.ai_pitch ~ "\n\nLet's connect!") | urlencode if lead.ai_pitch else "Hi! I build custom websites. Let me know if you are interested." | urlencode %}
+                                <a href="mailto:{{ lead.email }}?subject={{ subject }}&body={{ body }}" class="btn-circle" style="width: auto; padding: 0.5rem 1rem; border-radius: 1rem; color: #fff; background: #ea4335; text-decoration: none; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    📧 Send Email Pitch
+                                </a>
                                 {% endif %}
-                                {% if lead.twitter %}
-                                <a href="{{ lead.twitter }}" target="_blank" class="btn-circle">🐦</a>
+
+                                {% if lead.website %}
+                                <button onclick="submitContactForm({{ lead.id }}, this)" class="btn-circle" style="width: auto; padding: 0.5rem 1rem; border-radius: 1rem; color: #fff; background: #8b5cf6; text-decoration: none; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: none; cursor: pointer; transition: 0.3s ease;">
+                                    ✉️ Auto-Submit Contact Form
+                                </button>
                                 {% endif %}
-                                {% if lead.linkedin %}
-                                <a href="{{ lead.linkedin }}" target="_blank" class="btn-circle">💼</a>
-                                {% endif %}
+
+                                <div style="display: flex; gap: 0.5rem; justify-content: flex-start; margin-top: 0.25rem;">
+                                    {% if lead.instagram %}
+                                    <a href="{{ lead.instagram }}" target="_blank" class="btn-circle" style="transform: scale(0.8);">📸</a>
+                                    {% endif %}
+                                    {% if lead.linkedin %}
+                                    <a href="{{ lead.linkedin }}" target="_blank" class="btn-circle" style="transform: scale(0.8);">💼</a>
+                                    {% endif %}
+                                    {% if lead.twitter %}
+                                    <a href="{{ lead.twitter }}" target="_blank" class="btn-circle" style="transform: scale(0.8);">🐦</a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -504,5 +525,43 @@
             </table>
         </div>
     </div>
+    
+    <script>
+        async function submitContactForm(leadId, btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Submitting...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+            
+            try {
+                const response = await fetch(`/api/submit-contact/${leadId}`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    btn.innerHTML = '✅ Form Submitted';
+                    btn.style.background = '#10b981';
+                } else {
+                    console.error(data.error);
+                    btn.innerHTML = '❌ Submit Failed';
+                    btn.style.background = '#ef4444';
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.opacity = '1';
+                        btn.style.pointerEvents = 'auto';
+                        btn.style.background = '#8b5cf6';
+                    }, 3000);
+                }
+            } catch (e) {
+                btn.innerHTML = '❌ Submit Failed';
+                btn.style.background = '#ef4444';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.background = '#8b5cf6';
+                }, 3000);
+            }
+        }
+    </script>
 </body>
 </html>

@@ -43,53 +43,90 @@ def analyze_website(website_url: str, company_name: str, niche: str) -> dict:
     if website_url:
         is_social = any(sm in website_url.lower() for sm in SOCIAL_MEDIA_DOMAINS)
 
+    # Universal Prompt System for 100% Personalization
     if not website_url or not website_url.startswith("http"):
-        return {
-            "score": 85,
-            "pitch": (
-                f"I noticed {company_name} doesn't have a professional website. "
-                f"In today's market, 87% of customers search online before visiting a {niche}. "
-                f"I build fast, mobile-friendly websites for {niche}s that generate real leads. "
-                f"Can we connect for a 10-minute call this week?"
-            ),
-            "issues": "No website found - Highest Priority"
-        }
+        print(f"   [AI] Generating professional tailored pitch for {company_name} (No Website)...")
+        prompt = f"""You are a premium, high-ticket tech consultant.
+Business: "{company_name}"
+Niche: {niche}
+Current Status: Google Maps listed, but NO active website.
 
-    if is_social:
-        return {
-            "score": 90,
-            "pitch": (
-                f"I saw your {company_name} profile on social media! You have a great presence there, "
-                f"but you're missing out on direct bookings and SEO traffic without a dedicated website. "
-                f"I specialize in converting social media followers into customers with high-performance websites for {niche}s. "
-                f"Would you be open to a quick chat about this?"
-            ),
-            "issues": "Social media only - Great opportunity for dedicated site"
-        }
+They are losing local search customers and trust because they lack a digital footprint.
 
-    # Try to fetch website content
-    try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-        resp = requests.get(website_url, headers=headers, timeout=10)
-        page_text = resp.text[:2500]
-    except Exception:
-        page_text = "Website could not be loaded - likely outdated or broken."
+Respond EXACTLY in this format:
+SCORE: [85-95]
+ISSUES: [1-sentence explanation of how missing a website specifically hurts a {niche} in their city]
+PITCH: [A highly professional, 2-to-3 sentence WhatsApp pitch. Mention their exact business name. Highlight the pain of missing out on Google traffic, and offer a quick free mock-up to build trust. Be extremely professional and authoritative, yet accessible.]"""
 
-    prompt = f"""You are an expert web design sales consultant. Analyze this website.
+They currently rely ONLY on social media without a dedicated professional website.
+
+Respond in EXACTLY this format:
+SCORE: [85-100]
+ISSUES: [1-sentence specific reason why relying only on social media hurts a {niche}]
+PITCH: [A highly professional, 2-to-3 sentence WhatsApp outreach prioritizing business growth and offering to build a conversion-focused landing page for their exact niche.]"""
+
+        text = call_gemini(prompt)
+        if text:
+            score, issues, pitch = 85, "No Website", ""
+            for line in text.split("\n"):
+                line = line.strip()
+                if line.startswith("SCORE:"):
+                    try:
+                        score = int(line.replace("SCORE:", "").strip().split()[0])
+                    except:
+                        pass
+                elif line.startswith("ISSUES:"):
+                    issues = line.replace("ISSUES:", "").strip()
+                elif line.startswith("PITCH:"):
+                    pitch = line.replace("PITCH:", "").strip()
+            return {"score": score, "issues": issues, "pitch": pitch}
+        else:
+            return {"score": 85, "issues": "No website", "pitch": f"Hi, I noticed {company_name} doesn't have a website yet. We specialize in building platforms for {niche}s. Can we chat?"}
+
+    elif is_social:
+        print(f"   [AI] Analyzing Social Profile for {company_name}...")
+        prompt = f"""You are an expert tech consultant. We found this business via their social media.
+Business: "{company_name}"
+Niche: {niche}
+Platform URL: {website_url}
+
+        text = call_gemini(prompt)
+        if text:
+            score, issues, pitch = 90, "Social media only", ""
+            for line in text.split("\n"):
+                line = line.strip()
+                if line.startswith("SCORE:"):
+                    try:
+                        score = int(line.replace("SCORE:", "").strip().split()[0])
+                    except:
+                        pass
+                elif line.startswith("ISSUES:"):
+                    issues = line.replace("ISSUES:", "").strip()
+                elif line.startswith("PITCH:"):
+                    pitch = line.replace("PITCH:", "").strip()
+            return {"score": score, "issues": issues, "pitch": pitch}
+        else:
+            return {"score": 90, "issues": "Social media only", "pitch": f"Hey! Love the {company_name} content. I build high-converting sites for {niche}s. Want to see a free demo?"}
+
+    else:
+        # Business has a website, deeply analyze it
+        try:
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            resp = requests.get(website_url, headers=headers, timeout=10)
+            page_text = resp.text[:2500]
+        except Exception:
+            page_text = "Website could not be loaded - likely outdated or broken."
+
+        prompt = f"""You are an elite web application sales consultant. Analyze this website.
 
 Business: "{company_name}" (Type: {niche})
 URL: {website_url}
-Page Content: {page_text[:1500]}
+Page Content Extract: {page_text[:1500]}
 
-Respond in EXACTLY this format (no extra text):
-SCORE: [0-100, higher means more opportunity for us]
-ISSUES: [issue1] | [issue2] | [issue3]
-PITCH: [1-3 sentence personalized cold pitch mentioning their specific problems]
-
-Scoring guide:
-80-100: Very old/no website, no mobile support, no SEO, no booking system
-50-79: Has website but missing key features
-0-49: Modern, well-built site (low opportunity)"""
+Respond in EXACTLY this format:
+SCORE: [0-100, higher means more opportunity to rebuild]
+ISSUES: [Specifically mention 2 critical technical flaws from the content/URL]
+PITCH: [A 3-sentence, ultra-professional WhatsApp message. Mention their business name and the specific flaw you found on their website. Offer to build a fast, modern solution to directly increase their revenue. No generic text.]"""
 
     text = call_gemini(prompt)
     if not text:
@@ -137,7 +174,8 @@ def enrich_new_leads(batch_size: int = 20):
             )
 
             lead.ai_score = result["score"]
-            lead.notes = f"ISSUES: {result['issues']}\n\nPITCH: {result['pitch']}"
+            lead.notes = f"OBSERVATION: {result['issues']}"
+            lead.ai_pitch = result["pitch"]
 
             if result["score"] >= 70:
                 lead.status = "Hot Lead"
