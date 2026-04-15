@@ -10,9 +10,8 @@
             --primary: #6366f1;
             --primary-glow: rgba(99, 102, 241, 0.4);
             --bg: #030712;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --liquid-highlight: rgba(255, 255, 255, 0.3);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
             --text: #ffffff;
             --text-dim: #94a3b8;
             --success: #10b981;
@@ -98,24 +97,16 @@
 
         /* Liquid Search Bar */
         .search-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(40px) saturate(210%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 2.5rem;
-            border-radius: 2.5rem;
-            margin-bottom: 4rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 2rem;
+            margin-bottom: 3rem;
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             align-items: flex-end;
-            box-shadow: 
-                inset 0 0 50px rgba(255, 255, 255, 0.02),
-                0 40px 80px rgba(0,0,0,0.6);
-            animation: containerFloat 8s ease-in-out infinite;
-        }
-
-        @keyframes containerFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .search-group {
@@ -135,85 +126,41 @@
         }
 
         .search-input {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(25px) saturate(200%);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
             padding: 1rem 1.5rem;
-            border-radius: 1.25rem;
+            border-radius: 1rem;
             color: white;
             font-family: inherit;
             font-size: 1rem;
             outline: none;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 
-                inset 0 1px 1px var(--liquid-highlight),
-                0 4px 6px rgba(0,0,0,0.2);
-            appearance: none; /* Reset for better glass look */
-        }
-
-        .search-input:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .search-input:focus {
             border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 
-                inset 0 1px 1px var(--liquid-highlight),
-                0 0 20px var(--primary-glow);
-        }
-
-        /* Specific fix for dropdown options visibility */
-        .search-input option {
-            background-color: #111827; /* Dark background for options */
-            color: white; /* Force white text */
-            padding: 0.5rem;
-        }
-
-        .search-input optgroup {
-            background-color: #1f2937;
-            color: var(--primary);
-            font-weight: 700;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
         /* Liquid Button & Filter */
         .gooey-button {
             filter: url('#gooey');
             position: relative;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            background: var(--primary);
             color: white;
-            padding: 1.1rem 3rem;
             border: none;
-            border-radius: 2rem;
-            font-size: 0.95rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
+            padding: 1rem 2.5rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 
-                inset 0 2px 2px rgba(255,255,255,0.4),
-                0 15px 35px rgba(99, 102, 241, 0.35);
-        }
-
-        .gooey-button::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 50%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
-            border-radius: 2rem 2rem 0 0;
-            pointer-events: none;
+            transition: transform 0.2s;
+            overflow: visible;
         }
 
         .gooey-button:hover {
-            transform: scale(1.06) translateY(-4px);
-            letter-spacing: 0.18em;
-            box-shadow: 
-                inset 0 2px 2px rgba(255,255,255,0.6),
-                0 20px 45px rgba(99, 102, 241, 0.55);
+            transform: scale(1.05);
         }
 
         /* Table Overhaul */
@@ -306,7 +253,6 @@
         .source-maps { color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
         .source-twitter { color: #1da1f2; border-color: rgba(29, 161, 242, 0.3); }
         .source-reddit { color: #ff4500; border-color: rgba(255, 69, 0, 0.3); }
-        .source-freelance { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
 
         .intent-high { color: var(--danger); text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
@@ -371,36 +317,11 @@
             {% endif %}
             <div class="search-group">
                 <label>Niche</label>
-                <select name="niche" class="search-input" required>
-                    <option value="" disabled selected>Choose Niche...</option>
-                    <option value="Doctor Clinic">Doctor Clinic 🩺</option>
-                    <option value="Restaurant">Restaurant 🍽️</option>
-                    <option value="Plumber">Plumber 🔧</option>
-                </select>
+                <input type="text" name="niche" class="search-input" placeholder="e.g. Med Spa, Real Estate" required>
             </div>
             <div class="search-group">
                 <label>Location</label>
-                <select name="location" class="search-input" required>
-                    <option value="" disabled selected>Select Region...</option>
-                    <optgroup label="India 🇮🇳">
-                        <option value="Mumbai">Mumbai</option>
-                        <option value="Bangalore">Bangalore</option>
-                        <option value="Delhi NCR">Delhi NCR</option>
-                    </optgroup>
-                    <optgroup label="USA 🇺🇸">
-                        <option value="Miami, FL">Miami, FL</option>
-                        <option value="New York, NY">New York, NY</option>
-                        <option value="Beverly Hills, CA">Beverly Hills, CA</option>
-                    </optgroup>
-                    <optgroup label="Middle East 🇦🇪">
-                        <option value="Dubai">Dubai</option>
-                        <option value="Abu Dhabi">Abu Dhabi</option>
-                    </optgroup>
-                    <optgroup label="Europe 🇬🇧">
-                        <option value="London">London</option>
-                        <option value="Berlin">Berlin</option>
-                    </optgroup>
-                </select>
+                <input type="text" name="location" class="search-input" placeholder="e.g. Beverly Hills, London" required>
             </div>
             <button type="submit" class="gooey-button">GENERATE LEADS</button>
         </form>
@@ -443,20 +364,13 @@
                             <div class="source-badge source-{{ lead.source|lower }}">
                                 {% if lead.source == 'Twitter' %}🐦
                                 {% elif lead.source == 'Reddit' %}👽
-                                {% elif lead.source == 'Freelance' %}💼
                                 {% else %}📍{% endif %}
                                 {{ lead.source }}
                             </div>
                         </td>
                         <td>
                             <div style="font-weight: 700; font-size: 1rem;">{{ lead.company }}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">{{ lead.niche }} | {{ lead.city or 'Global' }}</div>
-                            {% if lead.ai_pitch %}
-                            <div style="margin-top: 0.5rem; background: rgba(99, 102, 241, 0.1); padding: 0.75rem; border-radius: 0.5rem; border-left: 2px solid var(--primary);">
-                                <div style="font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-bottom: 0.2rem;">✨ AI DM PITCH</div>
-                                <div style="font-size: 0.8rem; color: #fff;">{{ lead.ai_pitch }}</div>
-                            </div>
-                            {% endif %}
+                            <div style="font-size: 0.75rem; color: var(--text-dim);">{{ lead.niche }} | {{ lead.city or 'Global' }}</div>
                         </td>
                         <td>
                             <div style="font-weight: 800; font-size: 0.8rem;" class="intent-{{ lead.lead_intent|lower }}">
@@ -483,40 +397,24 @@
                             {% endif %}
                         </td>
                         <td>
-                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                {% if lead.phone %}
-                                {% set phone_clean = lead.phone | replace('+', '') | replace(' ', '') | replace('-', '') %}
-                                {% set pitch_encoded = lead.ai_pitch | urlencode if lead.ai_pitch else "Hey, I noticed you might need a new website. Can we chat?" | urlencode %}
-                                <a href="whatsapp://send?phone={{ phone_clean }}&text={{ pitch_encoded }}" class="btn-circle" style="width: auto; padding: 0.5rem 1rem; border-radius: 1rem; color: #fff; background: #25D366; text-decoration: none; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                    💬 Send WhatsApp Pitch
-                                </a>
-                                {% endif %}
-
+                            <div style="display: flex; gap: 0.75rem;">
                                 {% if lead.email %}
-                                {% set subject = ("Quick Idea for " ~ lead.company) | urlencode %}
-                                {% set body = (lead.ai_pitch ~ "\n\nLet's connect!") | urlencode if lead.ai_pitch else "Hi! I build custom websites. Let me know if you are interested." | urlencode %}
-                                <a href="mailto:{{ lead.email }}?subject={{ subject }}&body={{ body }}" class="btn-circle" style="width: auto; padding: 0.5rem 1rem; border-radius: 1rem; color: #fff; background: #ea4335; text-decoration: none; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                    📧 Send Email Pitch
-                                </a>
+                                <a href="mailto:{{ lead.email }}" class="btn-circle">📧</a>
                                 {% endif %}
-
-                                {% if lead.website %}
-                                <button onclick="submitContactForm({{ lead.id }}, this)" class="btn-circle" style="width: auto; padding: 0.5rem 1rem; border-radius: 1rem; color: #fff; background: #8b5cf6; text-decoration: none; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: none; cursor: pointer; transition: 0.3s ease;">
-                                    ✉️ Auto-Submit Contact Form
-                                </button>
+                                {% if lead.phone %}
+                                <a href="tel:{{ lead.phone }}" class="btn-circle">📞</a>
+                                <a href="https://wa.me/{{ lead.phone|replace(' ', '')|replace('-', '')|replace('(', '')|replace(')', '') }}?text={{ (lead.pitch or 'Hi!')|urlencode }}" target="_blank" class="btn-circle" style="background: rgba(37, 211, 102, 0.2); border-color: rgba(37, 211, 102, 0.3); color: #25d366;">💬</a>
                                 {% endif %}
-
-                                <div style="display: flex; gap: 0.5rem; justify-content: flex-start; margin-top: 0.25rem;">
-                                    {% if lead.instagram %}
-                                    <a href="{{ lead.instagram }}" target="_blank" class="btn-circle" style="transform: scale(0.8);">📸</a>
-                                    {% endif %}
-                                    {% if lead.linkedin %}
-                                    <a href="{{ lead.linkedin }}" target="_blank" class="btn-circle" style="transform: scale(0.8);">💼</a>
-                                    {% endif %}
-                                    {% if lead.twitter %}
-                                    <a href="{{ lead.twitter }}" target="_blank" class="btn-circle" style="transform: scale(0.8);">🐦</a>
-                                    {% endif %}
-                                </div>
+                                {% if lead.instagram %}
+                                <a href="{{ lead.instagram }}" target="_blank" class="btn-circle">📸</a>
+                                {% endif %}
+                                {% if lead.twitter %}
+                                <a href="{{ lead.twitter }}" target="_blank" class="btn-circle">🐦</a>
+                                {% endif %}
+                                {% if lead.linkedin %}
+                                <a href="{{ lead.linkedin }}" target="_blank" class="btn-circle">💼</a>
+                                {% endif %}
+                                <button onclick="enrichLead({{ lead.id }})" class="btn-circle" id="audit-{{ lead.id }}" title="AI Audit">✨</button>
                             </div>
                         </td>
                     </tr>
@@ -525,41 +423,27 @@
             </table>
         </div>
     </div>
-    
+
     <script>
-        async function submitContactForm(leadId, btn) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '⏳ Submitting...';
-            btn.style.opacity = '0.7';
-            btn.style.pointerEvents = 'none';
-            
+        async function enrichLead(leadId) {
+            const btn = document.getElementById(`audit-${leadId}`);
+            btn.innerHTML = "⏳";
+            btn.style.opacity = "0.5";
+
             try {
-                const response = await fetch(`/api/submit-contact/${leadId}`, { method: 'POST' });
+                const response = await fetch(`/enrich/${leadId}`, { method: 'POST' });
                 const data = await response.json();
-                
-                if (data.success) {
-                    btn.innerHTML = '✅ Form Submitted';
-                    btn.style.background = '#10b981';
+
+                if (data.status === 'success') {
+                    btn.innerHTML = "✅";
+                    setTimeout(() => location.reload(), 1000);
                 } else {
+                    btn.innerHTML = "❌";
                     console.error(data.error);
-                    btn.innerHTML = '❌ Submit Failed';
-                    btn.style.background = '#ef4444';
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                        btn.style.opacity = '1';
-                        btn.style.pointerEvents = 'auto';
-                        btn.style.background = '#8b5cf6';
-                    }, 3000);
                 }
-            } catch (e) {
-                btn.innerHTML = '❌ Submit Failed';
-                btn.style.background = '#ef4444';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.opacity = '1';
-                    btn.style.pointerEvents = 'auto';
-                    btn.style.background = '#8b5cf6';
-                }, 3000);
+            } catch (err) {
+                btn.innerHTML = "❌";
+                console.error(err);
             }
         }
     </script>

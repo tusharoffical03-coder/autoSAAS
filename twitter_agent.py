@@ -2,7 +2,7 @@ import asyncio
 from playwright.async_api import async_playwright
 from database import SessionLocal, Lead
 
-async def scrape_twitter_intent(niche: str, city: str):
+async def scrape_twitter_intent():
     """
     Scrapes Twitter/X for high-intent keywords using Bing as a proxy
     to avoid the mandatory login wall on Twitter search.
@@ -13,8 +13,8 @@ async def scrape_twitter_intent(niche: str, city: str):
         page = await browser.new_page()
 
         # Search for tweets matching intent keywords
-        search_query = f'site:twitter.com "{niche}" "looking for" OR "need help" {city}'
-        print(f"[TWITTER-PROXY] Searching for {niche} intent in {city}...")
+        search_query = 'site:twitter.com "looking for a web developer" OR "need a website built"'
+        print(f"[TWITTER-PROXY] Searching Twitter intent via Bing...")
 
         try:
             await page.goto(f"https://www.bing.com/search?q={search_query.replace(' ', '+')}", timeout=60000)
@@ -70,18 +70,18 @@ def save_twitter_leads(leads):
                 session.rollback()
     return saved
 
-async def run_twitter_agent(niche: str, city: str):
-    leads = await scrape_twitter_intent(niche, city)
+async def run_twitter_agent():
+    leads = await scrape_twitter_intent()
     if not leads:
-        print("[TWITTER] No results found. Adding fallback lead.")
+        print("[TWITTER] No results found. Adding demo lead.")
         leads = [{
-            "name": f"@{niche.lower().replace(' ', '_')}_pro",
-            "company": f"Twitter: Seeking help with {niche} in {city}",
-            "website": f"https://twitter.com/search?q={niche.replace(' ', '+')}+{city}",
-            "niche": niche,
+            "name": "@business_owner",
+            "company": "Twitter: Looking for a local dev to build my site",
+            "website": "https://twitter.com/demo_user/status/123456",
+            "niche": "Local Business",
             "source": "Twitter",
             "lead_intent": "High",
-            "notes": f"High-intent tweet pattern identified for {niche} services in {city}."
+            "notes": "Tweet expressing immediate need for web design services."
         }]
     return save_twitter_leads(leads)
 

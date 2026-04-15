@@ -2,7 +2,7 @@ import asyncio
 from playwright.async_api import async_playwright
 from database import SessionLocal, Lead
 
-async def scrape_reddit_mock(niche: str, city: str):
+async def scrape_reddit_mock():
     """
     Since Reddit is extremely aggressive with bot blocking in this environment,
     and we want to demonstrate the Multi-Agent architecture,
@@ -14,9 +14,8 @@ async def scrape_reddit_mock(niche: str, city: str):
         page = await browser.new_page()
 
         # Searching Bing for recent reddit posts
-        search_query = f'site:reddit.com "{niche}" "looking for" OR "hiring" {city}'
-        search_url = f"https://www.bing.com/search?q={search_query.replace(' ', '+')}"
-        print(f"[REDDIT-PROXY] Searching for {niche} intent in {city}...")
+        search_url = "https://www.bing.com/search?q=site:reddit.com+%22looking+for+web+design%22+OR+%22hiring+web+developer%22"
+        print(f"[REDDIT-PROXY] Searching via Bing...")
 
         try:
             await page.goto(search_url, timeout=60000)
@@ -70,19 +69,19 @@ def save_reddit_leads(leads):
                 session.rollback()
     return saved
 
-async def run_reddit_agent(niche: str, city: str):
-    leads = await scrape_reddit_mock(niche, city)
+async def run_reddit_agent():
+    leads = await scrape_reddit_mock()
     if not leads:
         # Fallback for demo purposes if search also blocked
-        print("[REDDIT] No live results found. Adding fallback intent lead.")
+        print("[REDDIT] Search blocked. Adding demo high-intent lead.")
         leads = [{
-            "name": f"u/{niche.lower().replace(' ', '_')}_seeker",
-            "company": f"Reddit: Looking for a {niche} specialist in {city}",
-            "website": f"https://www.reddit.com/r/smallbusiness/search?q={niche.replace(' ', '+')}",
-            "niche": niche,
+            "name": "u/startup_founder",
+            "company": "Reddit: Need a developer for my new SaaS",
+            "website": "https://www.reddit.com/r/smallbusiness/comments/demo_post",
+            "niche": "SaaS",
             "source": "Reddit",
             "lead_intent": "High",
-            "notes": f"High intent post found on Reddit regarding {niche} in {city}."
+            "notes": "User looking for a technical co-founder or freelancer on Reddit."
         }]
     return save_reddit_leads(leads)
 

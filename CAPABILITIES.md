@@ -22,17 +22,18 @@ The system is specifically tuned for agencies selling web design or SEO services
 
 ## 4. AI-Powered Personalization (Gemini AI)
 The system doesn't just find leads; it researches them:
-*   **Automated Audit**: AI analyzes the lead's social media or lack of website.
+*   **Manual & Auto Audits**: You can now trigger a "✨ AI Audit" for any individual lead directly from the dashboard to get a deep-dive analysis.
 *   **Custom Cold Pitches**: Generates 1-3 sentence personalized pitches based on the business niche and specific "missing features" (e.g., lack of mobile support or booking systems).
 *   **Intent Scoring**: Ranks leads as "Hot," "Medium," or "Low" priority automatically.
 
-## 5. Premium Interactive Dashboard
+## 5. Premium Interactive Dashboard & Outreach
+*   **One-Click WhatsApp Outreach**: Every lead with a phone number has a "💬" button. Clicking it opens WhatsApp Web/Mobile with your **AI-generated pitch already typed out**.
 *   **Visual Source Tracking**: See exactly where a lead came from (Reddit 👽, Twitter 🐦, or Maps 📍).
 *   **Intent Badges**: Quickly identify "High" intent leads with color-coded indicators.
 *   **CSV Export**: One-click export of all data (including AI notes and pitches) to your favorite CRM (GoHighLevel, HubSpot, etc.).
 *   **Background Processing**: Start a search and keep using the dashboard; the swarm works in the background without freezing the UI.
 
 ## Future Potential
-*   **WhatsApp Integration**: Automate the sending of the AI-generated pitches.
+*   **Auto-DM Agent**: Automatically sending the AI pitches to Twitter/Reddit leads.
 *   **LinkedIn Agent**: Add B2B lead generation via LinkedIn company profiles.
 *   **Voice AI Integration**: Use the phone numbers found to trigger AI-powered discovery calls.
